@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -16,8 +16,7 @@ export class UserService {
     ) { }
 
     async addUser(createUserDto: CreateUserDto): Promise<Users> {
-
-        /**Para Testeo */
+        /**For Test */
         for (let i = 0; i < 10000; i++) {
             const newUser = new Users();
             newUser.username = faker.internet.userName();
@@ -34,6 +33,22 @@ export class UserService {
     async getUsers(): Promise<Users[]> {
         const users = await this.userRepository.find();
         return users;
+    }
+
+    async getUser(id: number): Promise<Users> {
+        const user = await this.userRepository.findOne(id);
+        return user;
+    }
+
+    async updateUser(id: number, createUserDto: CreateUserDto): Promise<Users> {
+        const userId = await this.userRepository.findOne(id);
+        const updateUser = Object.assign(userId, createUserDto);
+        return await this.userRepository.save(updateUser);
+    }
+
+    async deleteUser(id: number): Promise<any> {
+        return await this.userRepository.delete(id);
+        // return deleteUser;
     }
 
 }
